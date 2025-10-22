@@ -1,5 +1,0 @@
-cd Desktop
-cd option-pricer
-dir
-python -m pip install -r requirements.txt
-streamlit run app.py
