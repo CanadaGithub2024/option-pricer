@@ -1,9 +1,7 @@
 # app.py
 # === ADSENSE HEAD CODE (PASTE HERE) ===
-st.markdown("""
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5164382331668899"
-     crossorigin="anonymous"></script>
-""", unsafe_allow_html=True)
+st.markdown("""<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5164382331668899"
+     crossorigin="anonymous"></script>""", unsafe_allow_html=True)
 import streamlit as st
 import yfinance as yf
 import pandas as pd
