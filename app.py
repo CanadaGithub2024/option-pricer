@@ -50,7 +50,7 @@ def bs_price_and_greeks(S: float, K: float, r: float, sigma: float, T: float, ki
         "delta": delta,
         "gamma": gamma,
         "vega": vega,
-        "theta_per_year": theta,
+        "theta": theta,
         "rho": rho,
     }
     return price, greeks
@@ -254,7 +254,7 @@ if st.button("Calculate", type="primary"):
             with cols[0]: st.metric("Delta", f"{greeks_base['delta']:.4f}")
             with cols[1]: st.metric("Gamma", f"{greeks_base['gamma']:.4f}")
             with cols[2]: st.metric("Vega", f"{greeks_base['vega']:.4f}")
-            with cols[3]: st.metric("Theta/yr", f"{greeks_base['theta_per_year']:.4f}")
+            with cols[3]: st.metric("Theta", f"{greeks_base['theta']:.4f}")
             with cols[4]: st.metric("Rho", f"{greeks_base['rho']:.4f}")
 
             if enable_whatif:
@@ -272,8 +272,8 @@ if st.button("Calculate", type="primary"):
                     cols = st.columns(5)
                     with cols[0]: st.metric("Delta", f"{greeks_what['delta']:.4f}")
                     with cols[1]: st.metric("Gamma", f"{greeks_what['gamma']:.4f}")
-                    with cols[2]: st.metric("Veggie", f"{greeks_what['vega']:.4f}")
-                    with cols[3]: st.metric("Theta/yr", f"{greeks_what['theta_per_year']:.4f}")
+                    with cols[2]: st.metric("Vega", f"{greeks_what['vega']:.4f}")
+                    with cols[3]: st.metric("Theta", f"{greeks_what['theta']:.4f}")
                     with cols[4]: st.metric("Rho", f"{greeks_what['rho']:.4f}")
 
         except Exception as e:
