@@ -353,7 +353,7 @@ with st.sidebar:
     </script>
     """, unsafe_allow_html=True)
 
-# === AD 4: FOOTER AD (NEW) ===
+# === AD 4: FOOTER AD ===
 st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("""
 <div style="text-align:center; padding:20px; background:#f9f9f9; border-top:1px solid #eee; margin-top:40px;">
@@ -364,5 +364,19 @@ st.markdown("""
   <script>
        (adsbygoogle = window.adsbygoogle || []).push({});
   </script>
+</div>
+""", unsafe_allow_html=True)
+
+# === BUY ME A COFFEE ===
+st.markdown("""
+<div style="text-align:center; margin:30px 0; padding:15px; background:#fff8e1; border-radius:8px; font-size:0.95em;">
+  <p style="margin:0 0 10px 0; color:#d97706; font-weight:600;">
+    Love this tool? Support its development!
+  </p>
+  <a href="https://www.buymeacoffee.com/OPTIONBREW" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+         alt="Buy Me A Coffee" 
+         style="height: 42px !important;width: 180px !important;">
+  </a>
 </div>
 """, unsafe_allow_html=True)
