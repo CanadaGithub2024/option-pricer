@@ -1,7 +1,4 @@
 # app.py
-# === ADSENSE HEAD CODE (PASTE HERE) ===
-st.markdown("""<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5164382331668899"
-     crossorigin="anonymous"></script>""", unsafe_allow_html=True)
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -10,6 +7,12 @@ import requests
 import math
 import datetime as dt
 from xml.etree import ElementTree as ET
+
+# === ADSENSE: LOAD SCRIPT ===
+st.markdown("""
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5164382331668899"
+     crossorigin="anonymous"></script>
+""", unsafe_allow_html=True)
 
 # -----------------------
 # Black–Scholes utilities (with scaled Greeks)
@@ -183,6 +186,7 @@ def human_tenor(tag: str) -> str:
 # -----------------------
 st.set_page_config(page_title="Option Pricer", layout="centered")
 st.title("Black–Scholes Option Pricer")
+
 # === TOP BANNER AD ===
 st.markdown("""
 <ins class="adsbygoogle"
@@ -195,9 +199,10 @@ st.markdown("""
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 """, unsafe_allow_html=True)
+
 st.markdown("**Real-time spot from [Yahoo Finance](https://finance.yahoo.com), realized vol, UST risk-free rate**")
 
-# ADDED: Disclaimer
+# Disclaimer
 st.markdown("""
 <div style="background-color:#fff3cd; padding:10px; border-radius:5px; border-left:4px solid #ffc107;">
 <strong>Disclaimer:</strong> This tool uses <strong>Yahoo Finance</strong> for price data and <strong>U.S. Treasury</strong> XML feed for rates. 
@@ -210,7 +215,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
     ticker = st.text_input("Ticker", value="MSFT", help="e.g. MSFT, AAPL, 0883.HK")
     
-    # ADDED: Manual spot price override
+    # Manual spot price override
     use_manual_spot = st.checkbox("Override Spot Price (Manual)", value=False)
     if use_manual_spot:
         S_manual = st.number_input("Manual Spot Price", min_value=0.01, value=450.0, step=0.5)
@@ -259,7 +264,6 @@ if st.button("Calculate", type="primary"):
             if use_manual_spot:
                 S_base = S_manual
                 spot_source = "Manual input"
-                # Still fetch history for volatility
                 _, hist = fetch_spot_and_hist(ticker, years_back)
             else:
                 S_base, hist = fetch_spot_and_hist(ticker, years_back)
@@ -317,3 +321,18 @@ if st.button("Calculate", type="primary"):
 
         except Exception as e:
             st.error(f"**Error:** {e}")
+
+# === OPTIONAL: SIDEBAR AD ===
+with st.sidebar:
+    st.markdown("### Sponsored")
+    st.markdown("""
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-5164382331668899"
+         data-ad-slot="1234567891"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    """, unsafe_allow_html=True)
