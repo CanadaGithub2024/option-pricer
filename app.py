@@ -9,7 +9,7 @@ import datetime as dt
 from xml.etree import ElementTree as ET
 
 # -----------------------
-# Black–Scholes utilities
+# Black–Scholes utilities (with scaled Greeks)
 # -----------------------
 def _norm_cdf(x: float) -> float:
     return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
@@ -22,7 +22,6 @@ def _d1_d2(S: float, K: float, r: float, sigma: float, T: float):
     d2 = d1 - sigma * math.sqrt(T)
     return d1, d2
 
-# MODIFIED: Scaled Greeks to market convention
 def bs_price_and_greeks(S: float, K: float, r: float, sigma: float, T: float, kind: str):
     kind = kind.lower()
     if sigma <= 0 or T <= 0 or S <= 0 or K <= 0:
@@ -45,20 +44,19 @@ def bs_price_and_greeks(S: float, K: float, r: float, sigma: float, T: float, ki
         raise ValueError("kind must be 'call' or 'put'")
 
     gamma = _norm_pdf(d1) / (S * sigma * math.sqrt(T))
-    vega = S * _norm_pdf(d1) * math.sqrt(T)  # raw vega (per 1.0 vol)
+    vega = S * _norm_pdf(d1) * math.sqrt(T)
 
-    # SCALED GREEKS (market standard)
     greeks = {
-        "delta": delta,                     # per $1 → unchanged
-        "gamma": gamma,                     # per $1 → unchanged
-        "vega": vega / 100,                 # per 1% volatility
-        "theta_per_day": theta / 365,       # per calendar day
-        "rho": rho / 100,                   # per 100 bps
+        "delta": delta,
+        "gamma": gamma,
+        "vega": vega / 100,           # per 1% vol
+        "theta_per_day": theta / 365, # per day
+        "rho": rho / 100,             # per 100 bps
     }
     return price, greeks
 
 # ---------------------------------
-# Market data: Robust yfinance
+# Market data: Yahoo Finance + Manual Override
 # ---------------------------------
 @st.cache_data(ttl=3600)
 def fetch_spot_and_hist(ticker: str, years_back: int = 5):
@@ -182,12 +180,28 @@ def human_tenor(tag: str) -> str:
 # -----------------------
 st.set_page_config(page_title="Option Pricer", layout="centered")
 st.title("Black–Scholes Option Pricer")
-st.markdown("**Real-time spot, realized vol, UST risk-free rate**")
+st.markdown("**Real-time spot from [Yahoo Finance](https://finance.yahoo.com), realized vol, UST risk-free rate**")
+
+# ADDED: Disclaimer
+st.markdown("""
+<div style="background-color:#fff3cd; padding:10px; border-radius:5px; border-left:4px solid #ffc107;">
+<strong>Disclaimer:</strong> This tool uses <strong>Yahoo Finance</strong> for price data and <strong>U.S. Treasury</strong> XML feed for rates. 
+Data may be delayed, incomplete, or inaccurate. <strong>Not for trading or investment decisions.</strong> Use at your own risk.
+</div>
+""", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
     ticker = st.text_input("Ticker", value="MSFT", help="e.g. MSFT, AAPL, 0883.HK")
+    
+    # ADDED: Manual spot price override
+    use_manual_spot = st.checkbox("Override Spot Price (Manual)", value=False)
+    if use_manual_spot:
+        S_manual = st.number_input("Manual Spot Price", min_value=0.01, value=450.0, step=0.5)
+    else:
+        S_manual = None
+
     strike = st.number_input("Strike Price", min_value=0.01, value=450.0, step=0.5)
     kind = st.radio("Option Type", ["Call", "Put"], horizontal=True)
 
@@ -226,7 +240,16 @@ if st.button("Calculate", type="primary"):
                 st.error("Expiry must be in the future.")
                 st.stop()
 
-            S_base, hist = fetch_spot_and_hist(ticker, years_back)
+            # --- Spot Price Logic ---
+            if use_manual_spot:
+                S_base = S_manual
+                spot_source = "Manual input"
+                # Still fetch history for volatility
+                _, hist = fetch_spot_and_hist(ticker, years_back)
+            else:
+                S_base, hist = fetch_spot_and_hist(ticker, years_back)
+                spot_source = f"Yahoo Finance (as of {pd.Timestamp.today().strftime('%Y-%m-%d')})"
+
             vol_map = {"7d": 7, "30d": 30, "3m (~63d)": 63, "6m (~126d)": 126, "1y (252d)": 252, "3y (~756d)": 756}
             sigma = realized_vol(hist, vol_map[vol_window])
 
@@ -247,11 +270,10 @@ if st.button("Calculate", type="primary"):
             price_base, greeks_base = bs_price_and_greeks(S_base, strike, r, sigma, T_base, kind.lower())
 
             st.success("**Base Evaluation**")
-            st.write(f"**{ticker.upper()}** | Spot: `{S_base:.4f}` | T: `{T_base:.4f}` years")
+            st.write(f"**{ticker.upper()}** | Spot: `{S_base:.4f}` | **Source: {spot_source}**")
             st.write(f"Vol ({vol_window}): **{sigma:.4%}** | {rf_msg}")
             st.metric(f"**{kind} Price**", f"{price_base:.4f}")
 
-            # MODIFIED: Updated metric labels with units
             cols = st.columns(5)
             with cols[0]: st.metric("Delta", f"{greeks_base['delta']:.4f}")
             with cols[1]: st.metric("Gamma", f"{greeks_base['gamma']:.4f}")
