@@ -1,4 +1,9 @@
 # app.py
+# === ADSENSE HEAD CODE (PASTE HERE) ===
+st.markdown("""
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5164382331668899"
+     crossorigin="anonymous"></script>
+""", unsafe_allow_html=True)
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -180,6 +185,18 @@ def human_tenor(tag: str) -> str:
 # -----------------------
 st.set_page_config(page_title="Option Pricer", layout="centered")
 st.title("Black–Scholes Option Pricer")
+# === TOP BANNER AD ===
+st.markdown("""
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-5164382331668899"
+     data-ad-slot="1234567890"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+""", unsafe_allow_html=True)
 st.markdown("**Real-time spot from [Yahoo Finance](https://finance.yahoo.com), realized vol, UST risk-free rate**")
 
 # ADDED: Disclaimer
