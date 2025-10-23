@@ -187,7 +187,7 @@ def human_tenor(tag: str) -> str:
 st.set_page_config(page_title="Option Pricer", layout="centered")
 st.title("Black–Scholes Option Pricer")
 
-# === AD 1: TOP BANNER ===
+# === TOP BANNER AD ===
 st.markdown("""
 <ins class="adsbygoogle"
      style="display:block"
@@ -300,22 +300,6 @@ if st.button("Calculate", type="primary"):
             with cols[3]: st.metric("Theta (per day)", f"{greeks_base['theta_per_day']:.4f}")
             with cols[4]: st.metric("Rho (per 100 bps)", f"{greeks_base['rho']:.4f}")
 
-            # === AD 2: BELOW RESULTS (NEW) ===
-            st.markdown("---")
-            st.markdown("""
-            <div style="text-align:center; margin:20px 0;">
-              <ins class="adsbygoogle"
-                   style="display:block"
-                   data-ad-client="ca-pub-5164382331668899"
-                   data-ad-slot="9876543210"
-                   data-ad-format="auto"
-                   data-full-width-responsive="true"></ins>
-              <script>
-                   (adsbygoogle = window.adsbygoogle || []).push({});
-              </script>
-            </div>
-            """, unsafe_allow_html=True)
-
             if enable_whatif:
                 if eval_date >= expiry:
                     st.error("Eval date must be before expiry.")
@@ -338,7 +322,7 @@ if st.button("Calculate", type="primary"):
         except Exception as e:
             st.error(f"**Error:** {e}")
 
-# === AD 3: SIDEBAR AD ===
+# === OPTIONAL: SIDEBAR AD ===
 with st.sidebar:
     st.markdown("### Sponsored")
     st.markdown("""
@@ -352,17 +336,3 @@ with st.sidebar:
          (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
     """, unsafe_allow_html=True)
-
-# === AD 4: FOOTER AD (NEW) ===
-st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("""
-<div style="text-align:center; padding:20px; background:#f9f9f9; border-top:1px solid #eee; margin-top:40px;">
-  <ins class="adsbygoogle"
-       style="display:inline-block;width:320px;height:100px;"
-       data-ad-client="ca-pub-5164382331668899"
-       data-ad-slot="1122334455"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-</div>
-""", unsafe_allow_html=True)
