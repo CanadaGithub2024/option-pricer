@@ -22,6 +22,7 @@ def _d1_d2(S: float, K: float, r: float, sigma: float, T: float):
     d2 = d1 - sigma * math.sqrt(T)
     return d1, d2
 
+# MODIFIED: Scaled Greeks to market convention
 def bs_price_and_greeks(S: float, K: float, r: float, sigma: float, T: float, kind: str):
     kind = kind.lower()
     if sigma <= 0 or T <= 0 or S <= 0 or K <= 0:
@@ -44,14 +45,15 @@ def bs_price_and_greeks(S: float, K: float, r: float, sigma: float, T: float, ki
         raise ValueError("kind must be 'call' or 'put'")
 
     gamma = _norm_pdf(d1) / (S * sigma * math.sqrt(T))
-    vega = S * _norm_pdf(d1) * math.sqrt(T)
+    vega = S * _norm_pdf(d1) * math.sqrt(T)  # raw vega (per 1.0 vol)
 
+    # SCALED GREEKS (market standard)
     greeks = {
-        "delta": delta,
-        "gamma": gamma,
-        "vega": vega,
-        "theta": theta,
-        "rho": rho,
+        "delta": delta,                     # per $1 → unchanged
+        "gamma": gamma,                     # per $1 → unchanged
+        "vega": vega / 100,                 # per 1% volatility
+        "theta_per_day": theta / 365,       # per calendar day
+        "rho": rho / 100,                   # per 100 bps
     }
     return price, greeks
 
@@ -64,7 +66,6 @@ def fetch_spot_and_hist(ticker: str, years_back: int = 5):
     if not ticker:
         raise ValueError("Ticker cannot be empty.")
 
-    # Try multiple ways
     hist = yf.Ticker(ticker).history(period=f"{years_back}y", auto_adjust=True)
     if hist.empty:
         end = pd.Timestamp.today().normalize()
@@ -250,12 +251,13 @@ if st.button("Calculate", type="primary"):
             st.write(f"Vol ({vol_window}): **{sigma:.4%}** | {rf_msg}")
             st.metric(f"**{kind} Price**", f"{price_base:.4f}")
 
+            # MODIFIED: Updated metric labels with units
             cols = st.columns(5)
             with cols[0]: st.metric("Delta", f"{greeks_base['delta']:.4f}")
             with cols[1]: st.metric("Gamma", f"{greeks_base['gamma']:.4f}")
-            with cols[2]: st.metric("Vega", f"{greeks_base['vega']:.4f}")
-            with cols[3]: st.metric("Theta", f"{greeks_base['theta']:.4f}")
-            with cols[4]: st.metric("Rho", f"{greeks_base['rho']:.4f}")
+            with cols[2]: st.metric("Vega (per 1%)", f"{greeks_base['vega']:.4f}")
+            with cols[3]: st.metric("Theta (per day)", f"{greeks_base['theta_per_day']:.4f}")
+            with cols[4]: st.metric("Rho (per 100 bps)", f"{greeks_base['rho']:.4f}")
 
             if enable_whatif:
                 if eval_date >= expiry:
@@ -272,9 +274,9 @@ if st.button("Calculate", type="primary"):
                     cols = st.columns(5)
                     with cols[0]: st.metric("Delta", f"{greeks_what['delta']:.4f}")
                     with cols[1]: st.metric("Gamma", f"{greeks_what['gamma']:.4f}")
-                    with cols[2]: st.metric("Vega", f"{greeks_what['vega']:.4f}")
-                    with cols[3]: st.metric("Theta", f"{greeks_what['theta']:.4f}")
-                    with cols[4]: st.metric("Rho", f"{greeks_what['rho']:.4f}")
+                    with cols[2]: st.metric("Vega (per 1%)", f"{greeks_what['vega']:.4f}")
+                    with cols[3]: st.metric("Theta (per day)", f"{greeks_what['theta_per_day']:.4f}")
+                    with cols[4]: st.metric("Rho (per 100 bps)", f"{greeks_what['rho']:.4f}")
 
         except Exception as e:
             st.error(f"**Error:** {e}")
