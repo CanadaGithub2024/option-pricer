@@ -8,7 +8,7 @@ import math
 import datetime as dt
 from xml.etree import ElementTree as ET
 
-# === ADSENSE: LOAD SCRIPT ===
+# === ADSENSE: LOAD SCRIPT (REQUIRED FOR ALL ADS) ===
 st.markdown("""
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5164382331668899"
      crossorigin="anonymous"></script>
@@ -171,7 +171,7 @@ def fetch_latest_treasury_par_yields():
         st.warning("UST fetch failed. Using default 4.5%.")
         return dt.date.today(), {tag: 0.045 for tag in TENOR_TO_YEARS}
 
-def pick_rate_nearest(T_years: float, yields: dict):
+def pick782_rate_nearest(T_years: float, yields: dict):
     available = [(tag, TENOR_TO_YEARS[tag]) for tag in TENOR_TO_YEARS if yields.get(tag) is not None]
     if not available:
         return "BC_1YEAR", 0.045
@@ -187,7 +187,7 @@ def human_tenor(tag: str) -> str:
 st.set_page_config(page_title="Option Pricer", layout="centered")
 st.title("Black–Scholes Option Pricer")
 
-# === TOP BANNER AD ===
+# === AD 1: TOP BANNER ===
 st.markdown("""
 <ins class="adsbygoogle"
      style="display:block"
@@ -300,6 +300,22 @@ if st.button("Calculate", type="primary"):
             with cols[3]: st.metric("Theta (per day)", f"{greeks_base['theta_per_day']:.4f}")
             with cols[4]: st.metric("Rho (per 100 bps)", f"{greeks_base['rho']:.4f}")
 
+            # === AD 2: BELOW RESULTS ===
+            st.markdown("---")
+            st.markdown("""
+            <div style="text-align:center; margin:20px 0;">
+              <ins class="adsbygoogle"
+                   style="display:block"
+                   data-ad-client="ca-pub-5164382331668899"
+                   data-ad-slot="9876543210"
+                   data-ad-format="auto"
+                   data-full-width-responsive="true"></ins>
+              <script>
+                   (adsbygoogle = window.adsbygoogle || []).push({});
+              </script>
+            </div>
+            """, unsafe_allow_html=True)
+
             if enable_whatif:
                 if eval_date >= expiry:
                     st.error("Eval date must be before expiry.")
@@ -322,7 +338,7 @@ if st.button("Calculate", type="primary"):
         except Exception as e:
             st.error(f"**Error:** {e}")
 
-# === OPTIONAL: SIDEBAR AD ===
+# === AD 3: SIDEBAR AD ===
 with st.sidebar:
     st.markdown("### Sponsored")
     st.markdown("""
@@ -336,3 +352,17 @@ with st.sidebar:
          (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
     """, unsafe_allow_html=True)
+
+# === AD 4: FOOTER AD (BOTTOM OF PAGE) ===
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align:center; padding:20px; background:#f9f9f9; border-top:1px solid #eee; margin-top:40px;">
+  <ins class="adsbygoogle"
+       style="display:inline-block;width:320px;height:100px;"
+       data-ad-client="ca-pub-5164382331668899"
+       data-ad-slot="1122334455"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+""", unsafe_allow_html=True)
